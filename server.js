@@ -6,11 +6,11 @@ const db = require('./models');
 const app = express();
 const port = 5000;
 
-// Middleware
+
 app.use(bodyParser.json());
 app.use(cors());
 
-// Routes
+
 app.post('/api/employees', async (req, res) => {
   try {
     const employee = await db.Employee.create(req.body);
