@@ -1,0 +1,11 @@
+
+{
+    "development": {
+      "username": "root",
+      "password": "Jitzsql@01",
+      "database": "employeedb",
+      "host": "127.0.0.1",
+      "dialect": "mysql"
+    }
+  }
+  
