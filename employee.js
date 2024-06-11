@@ -1,4 +1,4 @@
-// models/employee.js
+
 module.exports = (sequelize, DataTypes) => {
     const Employee = sequelize.define('Employee', {
       firstName: {
