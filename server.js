@@ -1,37 +1,19 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const db = require('./models');
 
 const app = express();
 const port = 5000;
 
-
-mongoose.connect('mongodb+srv://jitzk07:Jiten123@cluster0.vlhpd3i.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-
-const employeeSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String,
-  email: String,
-  phone: String,
-  address: String,
-});
-
-const Employee = mongoose.model('Employee', employeeSchema);
-
-
+// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-
+// Routes
 app.post('/api/employees', async (req, res) => {
   try {
-    const employee = new Employee(req.body);
-    await employee.save();
+    const employee = await db.Employee.create(req.body);
     res.status(201).send(employee);
   } catch (err) {
     res.status(400).send(err);
@@ -40,13 +22,46 @@ app.post('/api/employees', async (req, res) => {
 
 app.get('/api/employees', async (req, res) => {
   try {
-    const employees = await Employee.find();
+    const employees = await db.Employee.findAll();
     res.status(200).send(employees);
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Update an employee
+app.put('/api/employees/:id', async (req, res) => {
+  try {
+    const employee = await db.Employee.findByPk(req.params.id);
+    if (employee) {
+      await employee.update(req.body);
+      res.status(200).send(employee);
+    } else {
+      res.status(404).send({ message: 'Employee not found' });
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+// Delete an employee
+app.delete('/api/employees/:id', async (req, res) => {
+  try {
+    const employee = await db.Employee.findByPk(req.params.id);
+    if (employee) {
+      await employee.destroy();
+      res.status(200).send({ message: 'Employee deleted' });
+    } else {
+      res.status(404).send({ message: 'Employee not found' });
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+// Sync database and start server
+db.sequelize.sync().then(() => {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 });
